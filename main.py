@@ -54,13 +54,30 @@ def get_market_sentiment():
     }
 
     prompt = (
-        "Basé sur l’analyse des tendances récentes et des opinions des experts, "
-        "quelle est la direction probable du marché américain (S&P500, Nasdaq) pour les 2 à 4 prochaines semaines ? "
-        "Réponds UNIQUEMENT par un mot : "
-        "- UP (si le marché devrait monter 📈) "
-        "- DOWN (si le marché devrait descendre 📉) "
-        "- STABLE (si la tendance est neutre ou incertaine ➖) "
-        "AUCUNE EXPLICATION. Un seul mot."
+        "Agis comme un expert financier spécialisé dans l’analyse des marchés boursiers. Ta mission est d’analyser les tendances récentes du marché américain (S&P 500, Nasdaq) et de déterminer la direction probable pour les 2 prochaines semaines."
+
+        "🔍 Effectue des recherches sur des sites financiers reconnus et fiables, tels que :"
+
+        "Bloomberg (www.bloomberg.com)"
+        "CNBC - Markets (www.cnbc.com/markets)"
+       " Reuters - Business & Finance (www.reuters.com/finance)"
+        "Yahoo Finance (www.finance.yahoo.com)"
+       " Investing.com (www.investing.com)"
+       " MarketWatch (www.marketwatch.com)"
+       " The Wall Street Journal - Markets (www.wsj.com/market)"
+       " Seeking Alpha (www.seekingalpha.com)"
+       "TradingView (www.tradingview.com)"
+      "  📈 Basé sur ces sources et les opinions des experts, donne une prévision du marché en répondant UNIQUEMENT par un mot :"
+       " Dit juste un mot en minuscule:"
+     "   UP 📈 (si le marché devrait monter)"
+       " DOWN 📉 (si le marché devrait descendre)"
+       " STABLE ➖ (si la tendance est neutre ou incertaine)"
+       " et dit juste si d'apres les experts le marché est:"
+      "  sous évalué"
+        "surévalué"
+     "   bien évalué"
+
+       " soit concis et fournis uniquement 2 réponse"
     )
 
     payload = {
