@@ -14,17 +14,20 @@ app = Flask(__name__)
 
 # ====== 🧠 FONCTIONS DE GESTION DE L'HISTORIQUE ======
 def save_to_history(sentiment):
-    """Ajoute un nouveau résultat dans l'historique et sauvegarde dans history.json."""
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    """Ajoute un nouveau résultat AU DÉBUT de l'historique et sauvegarde dans history.json."""
+    timestamp = datetime.now().strftime("%d-%m-%Y %H:%M")
     new_entry = {"date": timestamp, "sentiment": sentiment}
 
     # Charge l'historique existant
     history = load_history()
-    history.append(new_entry)
+    
+    # Ajoute le nouvel élément AU DÉBUT de la liste
+    history.insert(0, new_entry)  # 🔥 Ajoute en haut au lieu de en bas
 
     # Sauvegarde l'historique mis à jour
     with open(HISTORY_FILE, "w") as file:
         json.dump(history, file, indent=4)
+
 
 def load_history():
     """Charge l'historique depuis history.json."""
