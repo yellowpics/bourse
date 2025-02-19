@@ -5,7 +5,7 @@ from flask import Flask, request, render_template_string, redirect, url_for
 from datetime import datetime
 
 # ====== 🔑 CONFIGURATION PERPLEXITY ======
-PERPLEXITY_API_KEY = "ta_cle_api_perplexity"
+PERPLEXITY_API_KEY = "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"
 API_URL = "https://api.perplexity.ai/chat/completions"
 
 # ====== 📂 STOCKAGE PERSISTANT ======
