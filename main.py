@@ -195,7 +195,14 @@ def home():
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     history = load_history()
-    return render_template_string(html_template, sentiment=sentiment, timestamp=timestamp, history=history)
+    
+    return render_template_string(
+        html_template, 
+        sentiment=sentiment, 
+        timestamp=timestamp, 
+        history=history, 
+        enumerate=enumerate  # 👈 Solution ici
+    )
 
 @app.route('/delete/<int:index>', methods=['POST'])
 def delete(index):
