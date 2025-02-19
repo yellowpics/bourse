@@ -1,39 +1,61 @@
-import requests
-from flask import Flask, request, render_template_string
-from datetime import datetime
 import os
+import json
+import requests
+from flask import Flask, request, render_template_string, redirect, url_for
+from datetime import datetime
 
 # ====== 🔑 CONFIGURATION PERPLEXITY ======
 PERPLEXITY_API_KEY = "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"
 API_URL = "https://api.perplexity.ai/chat/completions"
-PROMPT_FILE = "last_prompt.txt"
+HISTORY_FILE = "history.json"
 
 # ====== 🌐 APPLICATION FLASK ======
 app = Flask(__name__)
 
-# ====== 🧠 FONCTIONS DE MÉMOIRE POUR LE PROMPT ======
-def save_last_prompt(prompt):
-    """Enregistre le dernier prompt dans un fichier."""
-    with open(PROMPT_FILE, "w") as file:
-        file.write(prompt)
+# ====== 🧠 FONCTIONS DE GESTION DE L'HISTORIQUE ======
+def save_to_history(sentiment):
+    """Ajoute un nouveau résultat dans l'historique et sauvegarde dans history.json."""
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    new_entry = {"date": timestamp, "sentiment": sentiment}
 
-def load_last_prompt():
-    """Lit le dernier prompt enregistré."""
-    if os.path.exists(PROMPT_FILE):
-        with open(PROMPT_FILE, "r") as file:
-            return file.read().strip()
-    return ""
+    # Charge l'historique existant
+    history = load_history()
+    history.append(new_entry)
+
+    # Sauvegarde l'historique mis à jour
+    with open(HISTORY_FILE, "w") as file:
+        json.dump(history, file, indent=4)
+
+def load_history():
+    """Charge l'historique depuis history.json."""
+    if os.path.exists(HISTORY_FILE):
+        with open(HISTORY_FILE, "r") as file:
+            return json.load(file)
+    return []
+
+def delete_entry(index):
+    """Supprime un résultat de l'historique en fonction de son index."""
+    history = load_history()
+    if 0 <= index < len(history):
+        del history[index]  # Supprime l'élément
+        with open(HISTORY_FILE, "w") as file:
+            json.dump(history, file, indent=4)
 
 # ====== 📊 FONCTION POUR RÉCUPÉRER LE SENTIMENT ======
-def get_market_sentiment(custom_prompt):
+def get_market_sentiment():
     headers = {
         "Authorization": f"Bearer {PERPLEXITY_API_KEY}",
         "Content-Type": "application/json"
     }
 
-    prompt = custom_prompt if custom_prompt else (
-        "Donne UNIQUEMENT le sentiment du marché américain aujourd’hui (S&P500, Nasdaq) "
-        "sous la forme : Bullish, Bearish ou Neutral. Réponds par UN SEUL MOT."
+    prompt = (
+        "Basé sur l’analyse des tendances récentes et des opinions des experts, "
+        "quelle est la direction probable du marché américain (S&P500, Nasdaq) pour les 2 à 4 prochaines semaines ? "
+        "Réponds UNIQUEMENT par un mot : "
+        "- UP (si le marché devrait monter 📈) "
+        "- DOWN (si le marché devrait descendre 📉) "
+        "- STABLE (si la tendance est neutre ou incertaine ➖) "
+        "AUCUNE EXPLICATION. Un seul mot."
     )
 
     payload = {
@@ -42,7 +64,7 @@ def get_market_sentiment(custom_prompt):
             {"role": "system", "content": "Tu es un expert financier."},
             {"role": "user", "content": prompt}
         ],
-        "max_tokens": 80,
+        "max_tokens": 20,
         "temperature": 0.0
     }
 
@@ -53,14 +75,18 @@ def get_market_sentiment(custom_prompt):
 
         result = response.json()
         sentiment = result["choices"][0]["message"]["content"].strip()
+        
+        # Sauvegarde le résultat dans l'historique
+        save_to_history(sentiment)
+        
         return sentiment
     except Exception as e:
         return f"Erreur : {e}"
 
-# ====== 🌐 PAGE HTML DYNAMIQUE AVEC INPUT PROMPT ======
+# ====== 🌐 PAGE HTML DYNAMIQUE AVEC HISTORIQUE ======
 html_template = """
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <title>Sentiment du Marché</title>
@@ -78,7 +104,7 @@ html_template = """
         .sentiment {
             font-size: 100px;
             font-weight: bold;
-            color: {% if sentiment == 'Bullish' %}'#4CAF50'{% elif sentiment == 'Bearish' %}'#E74C3C'{% else %}'#3498DB'{% endif %};
+            color: {% if sentiment == 'UP' %}'#4CAF50'{% elif sentiment == 'DOWN' %}'#E74C3C'{% else %}'#3498DB'{% endif %};
         }
         .timestamp {
             font-size: 20px;
@@ -86,14 +112,6 @@ html_template = """
         }
         form {
             margin-bottom: 30px;
-        }
-        input[type="text"] {
-            font-size: 18px;
-            padding: 10px;
-            width: 60%;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ccc;
         }
         button {
             font-size: 20px;
@@ -108,44 +126,83 @@ html_template = """
         button:hover {
             background-color: #34495e;
         }
+        table {
+            margin: auto;
+            border-collapse: collapse;
+            width: 60%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #2c3e50;
+            color: white;
+        }
+        .delete-btn {
+            color: white;
+            background-color: red;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <h1>📊 Sentiment du Marché (S&P500 & Nasdaq)</h1>
 
-    <!-- FORMULAIRE POUR LE PROMPT PERSONNALISÉ -->
     <form method="POST" action="/">
-        <input type="text" name="custom_prompt" placeholder="Tape ton prompt ici" value="{{ last_prompt }}" required>
-        <br>
-        <button type="submit">📊 Lancer l'analyse</button>
+        <button type="submit">📊 Mettre à jour le sentiment</button>
     </form>
 
     {% if sentiment %}
         <div class="sentiment">{{ sentiment }}</div>
         <div class="timestamp">Dernière mise à jour : {{ timestamp }}</div>
     {% endif %}
+
+    <h2>📜 Historique des Prédictions</h2>
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Sentiment</th>
+            <th>Action</th>
+        </tr>
+        {% for i, entry in enumerate(history) %}
+        <tr>
+            <td>{{ entry['date'] }}</td>
+            <td>{{ entry['sentiment'] }}</td>
+            <td>
+                <form method="POST" action="/delete/{{ i }}">
+                    <button type="submit" class="delete-btn">❌</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
 </body>
 </html>
 """
 
-# ====== 📡 ROUTE PRINCIPALE ======
+# ====== 📡 ROUTES FLASK ======
 @app.route('/', methods=['GET', 'POST'])
 def home():
     sentiment = None
     timestamp = None
 
-    # Charge le dernier prompt enregistré
-    last_prompt = load_last_prompt()
-
     if request.method == 'POST':
-        custom_prompt = request.form.get('custom_prompt')
-        save_last_prompt(custom_prompt)  # Enregistre le nouveau prompt
-        sentiment = get_market_sentiment(custom_prompt)
+        sentiment = get_market_sentiment()
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    return render_template_string(html_template, sentiment=sentiment, timestamp=timestamp, last_prompt=last_prompt)
+    history = load_history()
+    return render_template_string(html_template, sentiment=sentiment, timestamp=timestamp, history=history)
+
+@app.route('/delete/<int:index>', methods=['POST'])
+def delete(index):
+    delete_entry(index)
+    return redirect(url_for('home'))
 
 # ====== 🚀 LANCEMENT SERVEUR ======
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
-
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
