@@ -9,12 +9,12 @@ PERPLEXITY_API_KEY = "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"
 API_URL = "https://api.perplexity.ai/chat/completions"
 
 # ====== 📂 STOCKAGE PERSISTANT ======
-PERSISTENT_DIR = "/persistent"
+PERSISTENT_DIR = "./data"
 HISTORY_FILE = os.path.join(PERSISTENT_DIR, "history.json")
 
-# 🔹 Créer le dossier persistant si inexistant
+# 🔥 Création du dossier "./data" si inexistant (Autorisé sur Render)
 if not os.path.exists(PERSISTENT_DIR):
-    os.makedirs(PERSISTENT_DIR)
+    os.makedirs(PERSISTENT_DIR, exist_ok=True)
 
 # ====== 🌐 APPLICATION FLASK ======
 app = Flask(__name__)
