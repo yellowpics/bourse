@@ -5,42 +5,44 @@ from flask import Flask, request, render_template_string, redirect, url_for
 from datetime import datetime
 
 # ====== 🔑 CONFIGURATION PERPLEXITY ======
-PERPLEXITY_API_KEY = "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"
+PERPLEXITY_API_KEY = "ta_cle_api_perplexity"
 API_URL = "https://api.perplexity.ai/chat/completions"
-HISTORY_FILE = "history.json"
+
+# ====== 📂 STOCKAGE PERSISTANT ======
+PERSISTENT_DIR = "/persistent"
+HISTORY_FILE = os.path.join(PERSISTENT_DIR, "history.json")
+
+# 🔹 Créer le dossier persistant si inexistant
+if not os.path.exists(PERSISTENT_DIR):
+    os.makedirs(PERSISTENT_DIR)
 
 # ====== 🌐 APPLICATION FLASK ======
 app = Flask(__name__)
 
 # ====== 🧠 FONCTIONS DE GESTION DE L'HISTORIQUE ======
 def save_to_history(sentiment):
-    """Ajoute un nouveau résultat AU DÉBUT de l'historique et sauvegarde dans history.json."""
-    timestamp = datetime.now().strftime("%d-%m-%Y %H:%M")
+    """Ajoute un nouveau résultat au début de l'historique et le sauvegarde."""
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     new_entry = {"date": timestamp, "sentiment": sentiment}
 
-    # Charge l'historique existant
     history = load_history()
-    
-    # Ajoute le nouvel élément AU DÉBUT de la liste
-    history.insert(0, new_entry)  # 🔥 Ajoute en haut au lieu de en bas
+    history.insert(0, new_entry)  # 🔥 Ajoute en haut
 
-    # Sauvegarde l'historique mis à jour
     with open(HISTORY_FILE, "w") as file:
         json.dump(history, file, indent=4)
 
-
 def load_history():
-    """Charge l'historique depuis history.json."""
+    """Charge l'historique depuis le fichier persisté."""
     if os.path.exists(HISTORY_FILE):
         with open(HISTORY_FILE, "r") as file:
             return json.load(file)
     return []
 
 def delete_entry(index):
-    """Supprime un résultat de l'historique en fonction de son index."""
+    """Supprime une entrée spécifique de l'historique."""
     history = load_history()
     if 0 <= index < len(history):
-        del history[index]  # Supprime l'élément
+        del history[index]
         with open(HISTORY_FILE, "w") as file:
             json.dump(history, file, indent=4)
 
@@ -52,30 +54,13 @@ def get_market_sentiment():
     }
 
     prompt = (
-        "Agis comme un expert financier spécialisé dans l’analyse des marchés boursiers. Ta mission est d’analyser les tendances récentes du marché américain (S&P 500, Nasdaq) et de déterminer la direction probable pour les 2 prochaines semaines."
-
-        "🔍 Effectue des recherches sur des sites financiers reconnus et fiables, tels que :"
-        
-        "Bloomberg (www.bloomberg.com)"
-        "CNBC - Markets (www.cnbc.com/markets)"
-       " Reuters - Business & Finance (www.reuters.com/finance)"
-        "Yahoo Finance (www.finance.yahoo.com)"
-       " Investing.com (www.investing.com)"
-       " MarketWatch (www.marketwatch.com)"
-       " The Wall Street Journal - Markets (www.wsj.com/market)"
-       " Seeking Alpha (www.seekingalpha.com)"
-       "TradingView (www.tradingview.com)"
-      "  📈 Basé sur ces sources et les opinions des experts, donne une prévision du marché en répondant UNIQUEMENT par un mot :"
-       " Dit juste un mot:"
-     "   UP 📈 (si le marché devrait monter)"
-       " DOWN 📉 (si le marché devrait descendre)"
-       " STABLE ➖ (si la tendance est neutre ou incertaine)"
-       " et dit juste si d'apres les experts le marché est:"
-      "  sous évalué"
-        "surévalué"
-     "   bien évalué"
-        
-       " soit concis et fournis uniquement 2 réponse"
+        "Basé sur l’analyse des tendances récentes et des opinions des experts, "
+        "quelle est la direction probable du marché américain (S&P500, Nasdaq) pour les 2 à 4 prochaines semaines ? "
+        "Réponds UNIQUEMENT par un mot : "
+        "- UP (si le marché devrait monter 📈) "
+        "- DOWN (si le marché devrait descendre 📉) "
+        "- STABLE (si la tendance est neutre ou incertaine ➖) "
+        "AUCUNE EXPLICATION. Un seul mot."
     )
 
     payload = {
@@ -215,14 +200,7 @@ def home():
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     history = load_history()
-    
-    return render_template_string(
-        html_template, 
-        sentiment=sentiment, 
-        timestamp=timestamp, 
-        history=history, 
-        enumerate=enumerate  # 👈 Solution ici
-    )
+    return render_template_string(html_template, sentiment=sentiment, timestamp=timestamp, history=history, enumerate=enumerate)
 
 @app.route('/delete/<int:index>', methods=['POST'])
 def delete(index):
