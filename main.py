@@ -93,7 +93,7 @@ def get_market_sentiment():
             "- SELL"
             "- BUY"
             "- 50/50"
-
+            "Fournis uniquement une réponses en un mot pour chaque analyse."
     )
 
     payload = {
