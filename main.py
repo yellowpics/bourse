@@ -54,30 +54,46 @@ def get_market_sentiment():
     }
 
     prompt = (
-        "Agis comme un expert financier spécialisé dans l’analyse des marchés boursiers. Ta mission est d’analyser les tendances récentes du marché américain (S&P 500, Nasdaq) et de déterminer la direction probable pour les 2 prochaines semaines."
+            "Agis comme un expert financier spécialisé dans l’analyse des marchés boursiers."
+            "Ta mission est d’analyser les tendances très récentes du marché américain (S&P 500, Nasdaq, etc)"
+            "et de déterminer la direction probable pour les 2 à 4 prochaines semaines."
+            
+            "🔍 Effectue des recherches sur des sites financiers reconnus et fiables, tels que :"
+            
+            "Bloomberg (www.bloomberg.com)"
+            "CNBC - Markets (www.cnbc.com/markets)"
+            "Reuters - Business & Finance (www.reuters.com/finance)"
+            "Yahoo Finance (www.finance.yahoo.com)"
+            "Investing.com (www.investing.com)"
+            "MarketWatch (www.marketwatch.com)"
+            "The Wall Street Journal - Markets (www.wsj.com/market)"
+            "Seeking Alpha (www.seekingalpha.com)"
+            "TradingView (www.tradingview.com)"
+            
+            "📈 Basé sur ces sources et les opinions des experts, donne une prévision du marché en répondant UNIQUEMENT par un mot :"
+            "UP 📈 (si le marché devrait monter)"
+            "DOWN 📉 (si le marché devrait descendre)"
+            "STABLE ➖ (si la tendance est neutre ou incertaine)"
+            
+            "Apres une analyse intelligente dit juste si le marché est:"
+            "sous évalué"
+            "surévalué"
+            "bien évalué"
+            
+            "Analyse le sentiment sur les crise ou les hausse énorme, si ya un risque de crise/crash qui se prépare ou de montée/bullish qui se prépare dans les prochains semaines / mois sinon 'RAS', tu dis 1 mot :"
+            "- crash"
+            "- Bullish"
+            "- RAS"
+            
+            "Et pour finir, tu dois faire une analyse approfondie et tu me donnes une conclusion en un mot"
+            "soit je vends une partie de mon portfolio car tu penses que le marché ne risque plus trop de monter et qu'on est au sommet,"
+            "soit d'acheter plus dans mon portfolio car tu penses que le marché ne va plus descendre que ça,"
+            "et/ou que le marché est dans une excellente dynamique haussière."
+            "Sinon tu dis 50/50 garde 50% d'espèces au cas où et 50% de part, car le marché n'avance pas et on ne sait pas, donne un seul mot :"
+            "- SELL"
+            "- BUY"
+            "- 50/50"
 
-        "🔍 Effectue des recherches sur des sites financiers reconnus et fiables, tels que :"
-
-        "Bloomberg (www.bloomberg.com)"
-        "CNBC - Markets (www.cnbc.com/markets)"
-       " Reuters - Business & Finance (www.reuters.com/finance)"
-        "Yahoo Finance (www.finance.yahoo.com)"
-       " Investing.com (www.investing.com)"
-       " MarketWatch (www.marketwatch.com)"
-       " The Wall Street Journal - Markets (www.wsj.com/market)"
-       " Seeking Alpha (www.seekingalpha.com)"
-       "TradingView (www.tradingview.com)"
-      "  📈 Basé sur ces sources et les opinions des experts, donne une prévision du marché en répondant UNIQUEMENT par un mot :"
-       " Dit juste un mot en minuscule:"
-     "   UP 📈 (si le marché devrait monter)"
-       " DOWN 📉 (si le marché devrait descendre)"
-       " STABLE ➖ (si la tendance est neutre ou incertaine)"
-       " et dit juste si d'apres les experts le marché est:"
-      "  sous évalué"
-        "surévalué"
-     "   bien évalué"
-
-       " soit concis et fournis uniquement 2 réponse"
     )
 
     payload = {
