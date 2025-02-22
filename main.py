@@ -90,11 +90,17 @@ def get_market_sentiment():
             "soit d'acheter plus dans mon portfolio car tu penses que le marché ne va plus descendre que ça,"
             "et/ou que le marché est dans une excellente dynamique haussière."
             "Choisi le meilleur ratio d'apres ton analyse d'expert Stock/liquidité, donne un seul choix :"
+            "- 100/0"
             "- 90/10"
+            "- 80/20"
             "- 70/30"
+            "- 60/40"
             "- 50/50"
+            "- 40/60"
             "- 30/70"
+            "- 20/80"
             "- 10/90"
+            "- 0/100"
             "Fournis uniquement une réponses en un mot pour chaque analyse."
     )
 
