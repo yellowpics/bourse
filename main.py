@@ -110,8 +110,8 @@ def get_market_sentiment():
             {"role": "system", "content": "Tu es un expert financier. Concis qui donne 4 mot seulment"},
             {"role": "user", "content": prompt}
         ],
-        "max_tokens": 20,
-        "temperature": 0.1
+        "max_tokens": 22,
+        "temperature": 0.05
     }
 
     try:
