@@ -101,11 +101,11 @@ def get_market_sentiment():
     payload = {
         "model": "sonar",
         "messages": [
-            {"role": "system", "content": "Tu es un expert financier."},
+            {"role": "system", "content": "Tu es un expert financier. Concis qui donne 4 mot seulment"},
             {"role": "user", "content": prompt}
         ],
         "max_tokens": 20,
-        "temperature": 0.0
+        "temperature": 0.1
     }
 
     try:
