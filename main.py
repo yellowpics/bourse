@@ -89,10 +89,12 @@ def get_market_sentiment():
             "soit je vends une partie de mon portfolio car tu penses que le marché ne risque plus trop de monter et qu'on est au sommet,"
             "soit d'acheter plus dans mon portfolio car tu penses que le marché ne va plus descendre que ça,"
             "et/ou que le marché est dans une excellente dynamique haussière."
-            "Sinon tu dis 50/50 garde 50% d'espèces au cas où et 50% de part, car le marché n'avance pas et on ne sait pas, donne un seul mot :"
-            "- SELL"
-            "- BUY"
+            "Choisi le meilleur ratio d'apres ton analyse d'expert Stock/liquidité, donne un seul choix :"
+            "- 90/10"
+            "- 70/30"
             "- 50/50"
+            "- 30/70"
+            "- 10/90"
             "Fournis uniquement une réponses en un mot pour chaque analyse."
     )
 
