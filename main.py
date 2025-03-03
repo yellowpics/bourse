@@ -56,7 +56,7 @@ def get_market_sentiment():
     prompt = (
             "Agis comme un expert financier spécialisé dans l’analyse des marchés boursiers."
             "Ta mission est d’analyser les tendances très récentes du marché américain (S&P 500, Nasdaq, etc)"
-            "et de déterminer la direction probable pour les 2 à 4 prochaines semaines. Et fournir une réponses extrêmement concise en 4 mot max"
+            "et de déterminer la direction probable pour les 2 à 5 prochaines jours. Et fournir une réponses extrêmement concise en 4 mot max"
             
             "🔍 Effectue des recherches sur des sites financiers reconnus et fiables, tels que :"
             
